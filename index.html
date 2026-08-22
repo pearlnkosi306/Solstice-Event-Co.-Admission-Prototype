@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Solstice Events Co. — Check-In Kiosk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="24" r="10" fill="currentColor" />
+        <path d="M6 24a14 14 0 0 1 28 0" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" opacity="0.55" />
+      </svg>
+      <div class="brand-text">
+        <p class="brand-name">Solstice Events Co.</p>
+        <p class="brand-sub">Check-In Kiosk &mdash; Meridian Conference</p>
+      </div>
+    </div>
+    <div class="conn-indicator" id="connIndicator" data-state="connecting">
+      <span class="dot"></span>
+      <span class="conn-label">Connecting to venue systems&hellip;</span>
+    </div>
+  </header>
+
+  <div class="solstice-arc-rail" aria-hidden="true">
+    <svg viewBox="0 0 1000 60" preserveAspectRatio="none" class="arc-svg">
+      <path d="M0,55 C 250,-10 750,-10 1000,55" class="arc-track" pathLength="100" />
+      <path d="M0,55 C 250,-10 750,-10 1000,55" class="arc-fill" id="arcFill" pathLength="100" />
+    </svg>
+  </div>
+
+  <main class="layout">
+
+    <section class="kiosk-panel">
+
+      <nav class="tabs" role="tablist" aria-label="Check-in method">
+        <button class="tab is-active" data-tab="scan" role="tab" aria-selected="true">Scan QR Badge</button>
+        <button class="tab" data-tab="manual" role="tab" aria-selected="false">Enter Attendee ID</button>
+        <button class="tab" data-tab="preview" role="tab" aria-selected="false">Staff Badge Preview</button>
+      </nav>
+
+      <div class="tab-panel is-active" data-panel="scan">
+        <p class="panel-hint">Point an attendee's badge QR code at the camera. Staff without a camera on hand can use the Staff Badge Preview tab instead.</p>
+        <div class="scan-stage">
+          <div id="qrReader" class="qr-reader"></div>
+          <button class="btn btn-ghost" id="toggleCamera" type="button">Start camera</button>
+        </div>
+      </div>
+
+      <div class="tab-panel" data-panel="manual">
+        <p class="panel-hint">Type or paste the attendee ID printed beneath the QR code on their badge.</p>
+        <form class="manual-form" id="manualForm">
+          <label for="manualId">Attendee ID</label>
+          <input id="manualId" name="manualId" type="text" placeholder="ATT-2001" autocomplete="off" />
+          <button class="btn btn-primary" type="submit">Check In</button>
+        </form>
+        <div class="quick-ids">
+          <span>Quick test:</span>
+          <button class="chip" data-quickid="ATT-2001" type="button">ATT-2001</button>
+          <button class="chip" data-quickid="ATT-2002" type="button">ATT-2002</button>
+          <button class="chip" data-quickid="ATT-2003" type="button">ATT-2003 (duplicate test)</button>
+        </div>
+      </div>
+
+      <div class="tab-panel" data-panel="preview">
+        <p class="panel-hint">Stand-ins for the three attendees' physical badges. Use "Simulate Scan" to test without a camera or a printed badge on hand.</p>
+        <div class="badge-grid" id="badgeGrid"><!-- populated by app.js --></div>
+      </div>
+
+      <div class="status-well" id="statusWell" aria-live="polite">
+        <p class="status-idle">Awaiting a scan or attendee ID.</p>
+      </div>
+
+    </section>
+
+    <aside class="feed-panel">
+      <h2>Live Activity</h2>
+      <p class="feed-hint">Every scan, printer queue event, and confirmation appears here the moment it happens &mdash; this is the asynchronous webhook flow in action.</p>
+      <ul class="feed-list" id="feedList"></ul>
+    </aside>
+
+  </main>
+
+  <footer class="foot-note">
+    <p>Prototype notice: badge printing is simulated by an in-app vendor worker over a real HTTP webhook callback. Email and SMS receipt delivery are simulated on-screen and are not sent to real inboxes or phones.</p>
+  </footer>
+</div>
+
+<template id="receiptTemplate">
+  <div class="receipt-card">
+    <div class="receipt-header">
+      <span class="receipt-badge">Checked In</span>
+      <span class="receipt-time" data-field="time"></span>
+    </div>
+    <h3 data-field="name"></h3>
+    <p class="receipt-id" data-field="id"></p>
+    <dl class="receipt-meta">
+      <div><dt>Job ID</dt><dd data-field="jobId"></dd></div>
+      <div><dt>Confirmed</dt><dd data-field="confirmedLabel"></dd></div>
+    </dl>
+    <div class="receipt-delivery">
+      <p>Send a copy of this receipt:</p>
+      <div class="delivery-buttons">
+        <button class="btn btn-outline" data-deliver="email" type="button">Email me</button>
+        <button class="btn btn-outline" data-deliver="sms" type="button">Text me</button>
+      </div>
+      <p class="delivery-result" data-field="deliveryResult"></p>
+    </div>
+  </div>
+</template>
+
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "solstice-checkin",
+  "version": "1.0.0",
+  "description": "Solstice Events Co. asynchronous badge check-in prototype (message-queue + webhook based)",
+  "main": "server/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "qrcode": "^1.5.3",
+    "uuid": "^9.0.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
