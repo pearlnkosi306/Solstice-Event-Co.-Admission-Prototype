@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Solstice Events Co. - Check-in Kiosk</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        h1 { color: #2c3e50; }
+        .attendee { border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+        .attendee button { padding: 8px 16px; cursor: pointer; }
+        .status { font-weight: bold; margin-top: 8px; }
+        .status.NOT_CHECKED_IN { color: #888; }
+        .status.CHECKED_IN { color: #27ae60; }
+        .status.DUPLICATE { color: #e67e22; }
+        #log { background: #f4f4f4; padding: 12px; border-radius: 8px; margin-top: 24px;
+               font-family: monospace; font-size: 13px; white-space: pre-wrap;
+               height: 150px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <h1>Solstice Events Co. — Check-in</h1>
+    <p>Synchronous badge-printer flow (original, pre-pivot spec).</p>
+
+    {% for id, a in attendees.items() %}
+    <div class="attendee" id="row-{{ id }}">
+        <strong>{{ id }} — {{ a.name }}</strong>
+        <div><button onclick="scanAttendee('{{ id }}')">Simulate scan</button></div>
+        <div class="status {{ a.status }}" id="status-{{ id }}">{{ a.status }}</div>
+    </div>
+    {% endfor %}
+
+    <div id="log"></div>
+
+    <script>
+        function log(msg) {
+            const el = document.getElementById('log');
+            el.textContent += new Date().toLocaleTimeString() + '  ' + msg + '\n';
+            el.scrollTop = el.scrollHeight;
+        }
+
+        async function scanAttendee(id) {
+            log(id + ' scanned - calling printer, waiting...');
+            const res = await fetch('/scan/' + id, { method: 'POST' });
+            const data = await res.json();
+            const statusEl = document.getElementById('status-' + id);
+            statusEl.textContent = data.status;
+            statusEl.className = 'status ' + data.status;
+            log(data.message || JSON.stringify(data));
+        }
+    </script>
+</body>
+</html>
